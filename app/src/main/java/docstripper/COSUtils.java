@@ -1,6 +1,10 @@
 package docstripper;
 
-import org.apache.pdfbox.cos.*;
+import org.apache.pdfbox.cos.COSBase;
+import org.apache.pdfbox.cos.COSDictionary;
+import org.apache.pdfbox.cos.COSName;
+import org.apache.pdfbox.cos.COSNumber;
+import org.apache.pdfbox.cos.COSString;
 
 public class COSUtils {
     /** Returns an "FYI" String of the object */
@@ -20,7 +24,6 @@ public class COSUtils {
                     .append(getFYI(child.getValue()))
                     .append("\n");
             }
-            s.setLength(Math.max(s.length() - 1, 0));
             return s.toString();
         } else {
             return o.toString();

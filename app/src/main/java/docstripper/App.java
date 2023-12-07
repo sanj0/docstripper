@@ -4,6 +4,7 @@
 package docstripper;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
@@ -14,12 +15,18 @@ public class App {
         var srcFile = DialogUtils.chooseFile()
             .orElseThrow(() -> new IllegalArgumentException("No file chosen"));
         var pdf = Loader.loadPDF(srcFile);
+        var docFYI = Optional.ofNullable(pdf.getDocumentInformation())
+            .map(PDDocumentInformation::getCOSObject)
+            .map(COSUtils::getFYI);
+        var metadataFYI = Optional.ofNullable(pdf.getDocumentCatalog().getMetadata())
+            .map(PDMetadata::getCOSObject)
+            .map(COSUtils::getFYI);
 
-        var metadataFYI =
-            COSUtils.getFYI(pdf.getDocumentInformation().getCOSObject()) +
-            COSUtils.getFYI(pdf.getDocumentCatalog().getMetadata().getCOSObject());
+        var fullMetadataFYI =
+            docFYI.orElse("\nno document info") +
+            metadataFYI.orElse("\nno xmp metadata");
 
-        if (!DialogUtils.confirm(metadataFYI))
+        if (!DialogUtils.confirm(fullMetadataFYI))
             System.exit(0);
 
         var dstFile = DialogUtils.chooseNewFile()
